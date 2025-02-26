@@ -21,7 +21,7 @@ okta = oauth.register(
     authorize_url=os.getenv("OKTA_AUTHORIZATION_SERVER"),
     access_token_url=os.getenv("OKTA_TOKEN_ENDPOINT"),
     userinfo_endpoint=os.getenv("OKTA_USERINFO_ENDPOINT"),
-    server_metadata_url="https://dev-06459131.okta.com/oauth2/default/.well-known/openid-configuration",
+    server_metadata_url=os.getenv("OKTA_SERVER_METADATA_URL"),
     jwks_uri=os.getenv("JWKS_URI"),
     client_kwargs={
         "scope": "openid profile email",
@@ -43,7 +43,6 @@ def login():
 def callback():
     try:
         token = okta.authorize_access_token()
-        app.logger.info("token")
         session["user"] = token
         app.logger.info(token)
         return redirect(url_for("profile"))
@@ -67,7 +66,9 @@ def profile():
 # Logout route
 @app.route("/logout")
 def logout():
+    app.logger.info(session)
     session.clear()
+    app.logger.info(session)
     return redirect(url_for("home"))
 
 if __name__ == "__main__":
